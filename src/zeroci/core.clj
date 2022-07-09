@@ -53,6 +53,8 @@
     (cmd/$> `[git clone ~repo-path -b ~branch ~work-dir])
     (cmd/$> `[git fetch] {:dir work-dir})
     (cmd/$> `[git checkout ~(:new job)] {:dir work-dir})
+    (cmd/$> `[git submodule update --init --recursive] {:dir work-dir})
+    (cmd/$> `[git submodule update --recursive] {:dir work-dir})
     (cmd/mv (:file job) progress-file)
     (spit (cmd/path work-dir "job.edn") (pr-str job))
 
