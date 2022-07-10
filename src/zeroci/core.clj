@@ -56,9 +56,11 @@
     (cmd/$> `[git submodule update --init --recursive] {:dir work-dir})
     (cmd/$> `[git submodule update --recursive] {:dir work-dir})
     (cmd/mv (:file job) progress-file)
-    (spit (cmd/path work-dir "job.edn") (pr-str job))
-
-    ))
+    (cmd/mkdirs work-dir ".zeroci")
+    (cmd/mkdirs work-dir ".zeroci" "services")
+    (cmd/mkdirs work-dir ".zeroci" "builds")
+    (spit (cmd/path work-dir ".zeroci" "job.edn") (pr-str job))
+    (cmd/$> `["./runme"] {:dir work-dir})))
 
 #_(let [br-dir (str wd "/branches/" (:branch commit))]
     (let [res (exec {:exec ["./runme"] :dir br-dir})]

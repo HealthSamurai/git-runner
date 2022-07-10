@@ -4,23 +4,21 @@
   (:gen-class))
 
 (defn read-build []
-  (read-string (slurp "job.edn")))
+  (read-string (slurp ".zeroci/job.edn")))
 
 (defn run-tests [build]
-  (require '[zeroci.core-test])
+  (require '[example-test])
   (let [res (clojure.test/run-all-tests)]
-    (spit (str "docs/" (:id build) ".html") (pr-str {:result res :commit build}))))
-
+    (spit (str ".zeroci/builds/" (:id build) ".edn") (pr-str {:result res :commit build}))))
 
 (defn start []
   (let [commit (read-build)]
     (run-tests commit)
-    (let [svc-path (str (System/getProperty "user.dir") "/services")]
+    (let [svc-path (str (System/getProperty "user.dir") "/.zeroci/services")]
       (.mkdirs (io/file svc-path))
-      (spit (str svc-path "/docs.edn")
-            (str {:exec ["clojure" "-M:prod" "zd.aidbox" "4445"]
-                  :version (:new commit)
-                  :dir "zendocs"})))))
+      (spit (str svc-path "/demo.edn")
+            (str {:exec ["clojure" "-M:prod" "example" :port]
+                  :version (:new commit)})))))
 
 (defn -main [& args]
   (start)

@@ -10,21 +10,24 @@
 
   (def root (cmd/path tmp "root"))
   (def repo (cmd/path tmp "repo"))
-  (def bare (cmd/path root "repos" "zeroci"))
+  (def bare (cmd/path root "repos" "example"))
+
+  (def workdir (cmd/path root "workspace" "example" "master"))
   
   ;; (cmd/$> `[rm -rf ~tmp])
 
   (def ztx (atom {:zeroci/opts {:root root}}))
 
-  (sub/init-repo ztx "zeroci")
+  (sub/init-repo ztx "example")
 
-  (cmd/$> `[git clone ~(str (fs/cwd)) ~repo])
+  (cmd/$> `[cp -R ~(cmd/path (fs/cwd) "example") ~repo])
 
+  (cmd/$> `[git init && git add . && git commit -m "init"] {:dir repo})
   (cmd/$> `[git remote add test ~bare] {:dir repo})
 
   (cmd/$> `[ls -lah ~bare])
 
-  (cmd/$> `[git push test] {:dir repo})
+  (cmd/$> `[git push --set-upstream test master] {:dir repo})
 
   (t/is (seq (cmd/lns (cmd/$> `[git log] {:dir bare}))))
 
@@ -47,11 +50,12 @@
 
   ;; (println (sub/get-jobs ztx))
 
-  (cmd/files "/tmp")
-
   (sub/run-jobs ztx)
 
-  (cmd/$> '[bash -c "rm -rf /tmp/zerocitest*"])
+  ;; (cmd/$> '[ls -Ra] {:dir workdir})
+
+  ;; (cmd/$> '[bash -c "rm -rf /tmp/zerocitest*"])
+
 
   )
 
